@@ -3,3 +3,8 @@
 .chart-label, .chart-label-then, .chart-label-now {
     color: #555;
 }
+
+.tophat-panel-icon {
+    margin: 0;
+    padding: 0;
+}
