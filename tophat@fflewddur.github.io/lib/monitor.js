@@ -624,7 +624,11 @@ var Meter = GObject.registerClass({
             if (isNaN(fillHeight)) {
                 fillHeight = 0;
             }
-            let style = `height:${fillHeight}px;width:${this.barWidth}em;background-color:${this.meterFGColor};`;
+            let color = this.meterFGColor;
+            if (usage[i] >= 90) {
+                color = Config.METER_LIMIT_COLOR;
+            }
+            let style = `height:${fillHeight}px;width:${this.barWidth}em;background-color:${color};`;
             this.bars[i].set_style(style);
         }
     }

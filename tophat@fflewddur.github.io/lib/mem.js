@@ -153,6 +153,10 @@ var MemMonitor = GObject.registerClass(
             this.hasProc = f.exists();
             this.refreshChartsTimer = 0;
             this.refreshProcessesTimer = 0;
+            this.memMon = null;
+            if (Gio.MemoryMonitor !== undefined) {
+                this.memMon = Gio.MemoryMonitor.dup_default();
+            }
 
             let gicon = Gio.icon_new_for_string(`${Me.path}/icons/mem-icon-symbolic.svg`);
             this.icon = new St.Icon({gicon, style_class: 'system-status-icon tophat-panel-icon'});
@@ -186,6 +190,21 @@ var MemMonitor = GObject.registerClass(
                 this._startTimers();
             });
             this._signals.push(id);
+            this.oomTimer = 0;
+            if (this.memMon) {
+                id = this.memMon.connect('low-memory-warning', () => {
+                    this.meter_fg_color = '#ff0000';
+                    if (this.oomTimer !== 0) {
+                        GLib.source_remove(this.oomTimer);
+                        this.oomTimer = 0;
+                    }
+                    this.oomTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 30 * 1000, () => {
+                        log('removing low memory warning');
+                    });
+                    log('low-memory-warning');
+                });
+                this._signals.push(id);
+            }
 
             this._buildMeter();
             this._buildMenu();
@@ -451,6 +470,10 @@ var MemMonitor = GObject.registerClass(
             Gio.Settings.unbind(this, 'meter-bar-width');
             Gio.Settings.unbind(this, 'show-animation');
             Gio.Settings.unbind(this, 'visualization');
+            if (this.memMon) {
+                this.memMon.unref();
+                this.memMon = null;
+            }
             super.destroy();
         }
     });
