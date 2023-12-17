@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "eslint": "^8.41.0",
-    "eslint-plugin-jsdoc": "^39.3.2"
+    "eslint": "^8.56.0",
+    "eslint-plugin-jsdoc": "^39.9.1"
   }
 }
